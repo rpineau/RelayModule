@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		9306A75C1EDE325800A1E90B /* RelayModule.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9306A75A1EDE325800A1E90B /* RelayModule.cpp */; };
 		9306A75D1EDE325800A1E90B /* RelayModule.h in Headers */ = {isa = PBXBuildFile; fileRef = 9306A75B1EDE325800A1E90B /* RelayModule.h */; };
-		933A04321EE0BD5D00D06551 /* StopWatch.h in Headers */ = {isa = PBXBuildFile; fileRef = 933A04311EE0BD5D00D06551 /* StopWatch.h */; };
 		933E14251EDCA6B90044D947 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 933E14211EDCA6B90044D947 /* main.cpp */; };
 		933E14261EDCA6B90044D947 /* main.h in Headers */ = {isa = PBXBuildFile; fileRef = 933E14221EDCA6B90044D947 /* main.h */; };
 		9354853B23E7C50200711E27 /* x2powercontrol.h in Headers */ = {isa = PBXBuildFile; fileRef = 9354853923E7C50200711E27 /* x2powercontrol.h */; };
@@ -21,7 +20,6 @@
 /* Begin PBXFileReference section */
 		9306A75A1EDE325800A1E90B /* RelayModule.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RelayModule.cpp; sourceTree = "<group>"; };
 		9306A75B1EDE325800A1E90B /* RelayModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RelayModule.h; sourceTree = "<group>"; };
-		933A04311EE0BD5D00D06551 /* StopWatch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StopWatch.h; sourceTree = "<group>"; };
 		933E14191EDCA6680044D947 /* libRelayModule.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libRelayModule.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		933E14211EDCA6B90044D947 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		933E14221EDCA6B90044D947 /* main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
@@ -66,7 +64,6 @@
 			children = (
 				9354853A23E7C50200711E27 /* x2powercontrol.cpp */,
 				9354853923E7C50200711E27 /* x2powercontrol.h */,
-				933A04311EE0BD5D00D06551 /* StopWatch.h */,
 				9306A75A1EDE325800A1E90B /* RelayModule.cpp */,
 				9306A75B1EDE325800A1E90B /* RelayModule.h */,
 				933E14211EDCA6B90044D947 /* main.cpp */,
@@ -92,7 +89,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				933E14261EDCA6B90044D947 /* main.h in Headers */,
-				933A04321EE0BD5D00D06551 /* StopWatch.h in Headers */,
 				9354853B23E7C50200711E27 /* x2powercontrol.h in Headers */,
 				9306A75D1EDE325800A1E90B /* RelayModule.h in Headers */,
 			);
