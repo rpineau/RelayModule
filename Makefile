@@ -1,4 +1,4 @@
-# Makefile for libPegasusController
+# Makefile for libRelayModule
 
 CC = gcc
 CFLAGS = -fPIC -Wall -Wextra -O2 -g -DSB_LINUX_BUILD -I. -I./../../
@@ -6,9 +6,9 @@ CPPFLAGS = -fPIC -Wall -Wextra -O2 -g -DSB_LINUX_BUILD -I. -I./../../
 LDFLAGS = -shared -lstdc++
 RM = rm -f
 STRIP = strip
-TARGET_LIB = libPegasusUPB.so
+TARGET_LIB = libRelayModule.so
 
-SRCS = main.cpp pegasus_upb.cpp x2focuser.cpp
+SRCS = main.cpp RelayModule.cpp x2powercontrol.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 .PHONY: all

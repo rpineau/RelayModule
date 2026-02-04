@@ -2,7 +2,7 @@
 
 extern "C" PlugInExport int sbPlugInName2(BasicStringInterface& str)
 {
-	str = "Pegasus Astro Pocket Power Box Plug In";
+	str = "USB Relay Module Plugin";
 
 	return 0;
 }

@@ -1,7 +1,7 @@
 //
-//  Pegasus pocket power box X2 plugin
+//  USB Relay module X2 plugin
 //
-//  Created by Rodolphe Pineau on 3/11/2020.
+//  Created by Rodolphe Pineau on 1/10/2026.
 
 
 #include "RelayModule.h"

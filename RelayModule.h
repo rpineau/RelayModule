@@ -1,6 +1,7 @@
 //
+//  USB Relay module X2 plugin
 //
-//  Created by Rodolphe Pineau on 3/11/2020.
+//  Created by Rodolphe Pineau on 1/10/2026.
 
 
 #ifndef __RELAY_MODULE_C__
@@ -98,4 +99,4 @@ protected:
 
 };
 
-#endif //__PEGASUS_C__
+#endif //__RELAY_MODULE_C__
