@@ -71,15 +71,15 @@ bool X2PowerControl::isLinked() const
 
 void X2PowerControl::deviceInfoNameShort(BasicStringInterface& str) const
 {
-	str = "Pegasus Astro PPB";
+	str = "USB relay module";
 }
 void X2PowerControl::deviceInfoNameLong(BasicStringInterface& str) const
 {
-	str = "Pegasus Astro PPB";
+	str = "USB relay module";
 }
 void X2PowerControl::deviceInfoDetailedDescription(BasicStringInterface& str) const
 {
-	str = "Pegasus Astro PPB power port controll";
+	str = "USB relay module power port controll";
 }
 void X2PowerControl::deviceInfoFirmwareVersion(BasicStringInterface& str)
 {
@@ -87,12 +87,12 @@ void X2PowerControl::deviceInfoFirmwareVersion(BasicStringInterface& str)
 }
 void X2PowerControl::deviceInfoModel(BasicStringInterface& str)
 {
-	str = "Pegasus Astro PPB";
+	str = "USB relay module";
 }
 
 void X2PowerControl::driverInfoDetailedInfo(BasicStringInterface& str) const
 {
-	str = "Pegasus Astro PPB X2 plugin by Rodolphe Pineau";
+	str = "USB relay module X2 plugin by Rodolphe Pineau";
 }
 
 double X2PowerControl::driverInfoVersion(void) const
@@ -119,8 +119,8 @@ int X2PowerControl::queryAbstraction(const char* pszName, void** ppVal)
 
 int X2PowerControl::numberOfCircuits(int& nNumber)
 {
-	// nNumber = m_PowerPorts.getPortCount();
-	return 0;
+	nNumber = m_PowerPorts.getPortCount();
+	return SB_OK;
 }
 
 int X2PowerControl::circuitState(const int& nIndex, bool& bZeroForOffOneForOn)
@@ -129,12 +129,12 @@ int X2PowerControl::circuitState(const int& nIndex, bool& bZeroForOffOneForOn)
 
 	if(!m_bLinked)
         return ERR_NOLINK;
-/*
+
 	if (nIndex >= 0 && nIndex<m_PowerPorts.getPortCount())
-        bZeroForOffOneForOn = m_PowerPorts.getPortStatus(nIndex+1, bZeroForOffOneForOn);
+        bZeroForOffOneForOn = m_PowerPorts.getPortState(nIndex);
 	else
 		nErr = ERR_INDEX_OUT_OF_RANGE;
-*/
+
 	return nErr;
 }
 
@@ -144,12 +144,12 @@ int X2PowerControl::setCircuitState(const int& nIndex, const bool& bZeroForOffOn
 
 	if(!m_bLinked)
         return ERR_NOLINK;
-/*
+
 	if (nIndex >= 0 && nIndex < m_PowerPorts.getPortCount())
-        nErr = m_PowerPorts.setPort(nIndex+1, bZeroForOffOneForOn);
+        nErr = m_PowerPorts.setPortState(nIndex, bZeroForOffOneForOn);
 	else
 		nErr = ERR_INDEX_OUT_OF_RANGE;
-*/
+
 	return nErr;
 }
 

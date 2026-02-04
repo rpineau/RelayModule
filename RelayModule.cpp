@@ -82,18 +82,9 @@ void CRelayModule::Disconnect()
 }
 
 #pragma mark getters and setters
-int CRelayModule::getStatus(int &nStatus)
+int CRelayModule::getPortCount()
 {
-	int nErr = PLUGIN_OK;
-	std::string sResp;
-
-	if(!m_bIsConnected)
-		return ERR_COMMNOLINK;
-
-    // OK_ppb or OK_PPB
-    if(nErr)
-        return nErr;
-    return nErr;
+	return NB_PORTS;
 }
 
 
@@ -117,151 +108,49 @@ int CRelayModule::getFirmwareVersion(std::string sVersion)
 }
 
 
-bool CRelayModule::getPortOn(const int &nPortNumber)
-{
-
-	return false;
-}
-
-int CRelayModule::setPortOn(const int &nPortNumber, const bool &bEnabled)
+int CRelayModule::setPortState(const int &nPortNumber, const bool &bEnabled)
 {
     int nErr = PLUGIN_OK;
+	byte portStateCmd[4] = {0xA0, 0x00, 0x00, 0x00};
 
-	switch(nPortNumber) {
-		case 0:
-			port1Toggle(bEnabled);
-			break;
-		case 1:
-			port2Toggle(bEnabled);
-			break;
-		case 2:
-			port3Toggle(bEnabled);
-			break;
-		case 3:
-			port4Toggle(bEnabled);
-			break;
-		default:
-			return ERR_CMDFAILED;
-			break;
-	}
+	//set port
+	portStateCmd[1] = byte(nPortNumber+1);
+	// set state
+	portStateCmd[2] = byte(bEnabled?1:0);
+
+	// checksum
+	portStateCmd[3] = portStateCmd[0] + portStateCmd[1] + portStateCmd[2];
+
+	nErr = portCommand(portStateCmd);
 
     return nErr;
 }
 
 
-int CRelayModule::port1Toggle(bool bOn)
+bool CRelayModule::getPortState(int nPort)
 {
+	bool bState = false;
 	int nErr = PLUGIN_OK;
-	byte portOnCmd[4] = {0xA0, 0x01, 0x01, 0xA2};
-	byte portOffCmd[4] = {0xA0, 0x01, 0x00, 0xA1};
+	std::string sResp;
+	byte portStatesCmd[4] = {0xA0, 0x01, 0x02, 0xA3};
 
 	if(!m_bIsConnected)
 		return ERR_COMMNOLINK;
 
-	if(bOn) {
-		portCommand(portOnCmd);
-	}
-	else {
-		portCommand(portOffCmd);
-	}
-
-	return nErr;
-}
-
-int CRelayModule::port2Toggle(bool bOn)
-{
-	int nErr = PLUGIN_OK;
-	byte portOnCmd[4] = {0xA0, 0x02, 0x01, 0xA3};
-	byte portOffCmd[4] = {0xA0, 0x02, 0x00, 0xA2};
-
-	if(!m_bIsConnected)
-		return ERR_COMMNOLINK;
-
-	if(bOn) {
-		portCommand(portOnCmd);
-	}
-	else {
-		portCommand(portOffCmd);
-	}
-
-	return nErr;
-}
-
-int CRelayModule::port3Toggle(bool bOn)
-{
-	int nErr = PLUGIN_OK;
-	byte portOnCmd[4] = {0xA0, 0x03, 0x01, 0xA4};
-	byte portOffCmd[4] = {0xA0, 0x03, 0x00, 0xA3};
-
-	if(!m_bIsConnected)
-		return ERR_COMMNOLINK;
-
-	if(bOn) {
-		portCommand(portOnCmd);
-	}
-	else {
-		portCommand(portOffCmd);
-	}
-
-	return nErr;
-}
-
-int CRelayModule::port4Toggle(bool bOn)
-{
-	int nErr = PLUGIN_OK;
-	byte portOnCmd[4] = {0xA0, 0x04, 0x01, 0xA5};
-	byte portOffCmd[4] = {0xA0, 0x04, 0x00, 0xA};
-
-	if(!m_bIsConnected)
-		return ERR_COMMNOLINK;
-
-	if(bOn) {
-		portCommand(portOnCmd);
-	}
-	else {
-		portCommand(portOffCmd);
-	}
-	return nErr;
-}
-
-int CRelayModule::getPortStates()
-{
-	int nErr = PLUGIN_OK;
-	byte respBuffer[16];
-	byte portStatesCmd[4] = {0xA0, 0x0F, 0x02, 0xB1};
-
-	if(!m_bIsConnected)
-		return ERR_COMMNOLINK;
+	//set port
+	portStatesCmd[1] = byte(nPort+1);
+	// checksum
+	portStatesCmd[3] = portStatesCmd[0] + portStatesCmd[1] + portStatesCmd[2];
 
 	portCommand(portStatesCmd);
-	readResponse(respBuffer, 16);
-	return nErr;
+	nErr = readResponse(sResp);
+	if(sResp.find(":ON") != std::string::npos)
+		bState = true;
+	else if(sResp.find(":OFF") != std::string::npos)
+		bState = false;
 
+	return bState;
 }
-
-bool CRelayModule::portState(int nPort)
-{
-	getPortStates();
-	switch(nPort) {
-		case 0:
-			return port1On;
-			break;
-		case 1:
-			return port2On;
-			break;
-		case 2:
-			return port3On;
-			break;
-		case 3:
-			return port4On;
-			break;
-		default:
-			return false;
-			break;
-	}
-	return false;
-}
-
 
 int CRelayModule::portCommand(byte *cmd)
 {
@@ -301,16 +190,17 @@ int CRelayModule::portCommand(byte *cmd)
 #pragma mark command and response functions
 
 
-int CRelayModule::readResponse(byte *sResp, int size, int nTimeout )
+int CRelayModule::readResponse(std::string &sResp, int nTimeout, char cEndOfResponse)
 {
 	int nErr = PLUGIN_OK;
-	byte pszBuf[SERIAL_BUFFER_SIZE];
+	char pszBuf[SERIAL_BUFFER_SIZE];
 	unsigned long ulBytesRead = 0;
 	unsigned long ulTotalBytesRead = 0;
-	byte *pszBufPtr;
+	char *pszBufPtr;
 	int nBytesWaiting = 0 ;
 	int nbTimeouts = 0;
 
+	sResp.clear();
 	memset(pszBuf, 0, SERIAL_BUFFER_SIZE);
 	pszBufPtr = pszBuf;
 
@@ -360,13 +250,10 @@ int CRelayModule::readResponse(byte *sResp, int size, int nTimeout )
 
 		ulTotalBytesRead += ulBytesRead;
 		pszBufPtr+=ulBytesRead;
-	} while (ulTotalBytesRead < size);
+	} while (ulTotalBytesRead < SERIAL_BUFFER_SIZE  && *(pszBufPtr-1) != cEndOfResponse);
 
 
 #if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
-	hexdump(pszBuf,  size, hexOut);
-	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [haltFocuser] sending : " << std::endl << hexOut << std::endl;
-
 	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [" << __func__ << "] pszBuf = '" << pszBuf << "'" << std::endl;
 	m_sLogFile.flush();
 #endif
@@ -375,49 +262,11 @@ int CRelayModule::readResponse(byte *sResp, int size, int nTimeout )
 	if(!ulTotalBytesRead)
 		nErr = COMMAND_TIMEOUT; // we didn't get an answer.. so timeout
 	else
-		memcpy(sResp,pszBuf, size);
+		*(pszBufPtr-1) = 0; //remove the cEndOfResponse
+
+	sResp.assign(pszBuf);
 	return nErr;
 }
-
-
-int CRelayModule::parseResp(const std::string sResp, std::vector<std::string> &svFields, char cSeparator)
-{
-	int nErr = PLUGIN_OK;
-	std::string sSegment;
-
-#if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
-	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [" << __func__ << "] sResp = " << sResp << std::endl;
-	m_sLogFile.flush();
-#endif
-
-	if(sResp.size()==0) {
-		return ERR_CMDFAILED;
-	}
-
-	std::stringstream ssTmp(sResp);
-
-	svFields.clear();
-	// split the string into vector elements
-	while(std::getline(ssTmp, sSegment, cSeparator))
-	{
-#if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 3
-		m_sLogFile << "["<<getTimeStamp()<<"]"<< " [" << __func__ << "] sSegment = " << sSegment << std::endl;
-		m_sLogFile.flush();
-#endif
-		svFields.push_back(sSegment);
-	}
-
-	if(svFields.size()==0) {
-		nErr = ERR_CMDFAILED;
-	}
-#if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
-	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [" << __func__ << "] Done all good." << std::endl;
-	m_sLogFile.flush();
-#endif
-
-	return nErr;
-}
-
 
 #ifdef PLUGIN_DEBUG
 void  CRelayModule::hexdump(const byte *inputData, int inputSize,  std::string &outHex)

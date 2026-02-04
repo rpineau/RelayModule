@@ -61,28 +61,19 @@ public:
 
     void        SetSerxPointer(SerXInterface *p) { m_pSerx = p; };
 
+	int			getPortCount();
+
     // getter and setter
     int         getStatus(int &nStatus);
     int         getFirmwareVersion(std::string sVersion);
 
-	bool        getPortOn(const int &nPortNumber);
-    int         setPortOn(const int &nPortNumber, const bool &bEnabled);
-	bool		portState(int nPort);
+    int         setPortState(const int &nPortNumber, const bool &bEnabled);
+	bool		getPortState(int nPort);
 
 protected:
 
-	int			readResponse(byte *sResp, int size, int nTimeout = MAX_TIMEOUT);
-	int			parseResp(const std::string sResp, std::vector<std::string> &svFields, char cSeparator);
-
-
-	int		port1Toggle(bool bOn);
-	int		port2Toggle(bool bOn);
-	int		port3Toggle(bool bOn);
-	int		port4Toggle(bool bOn);
-
-	int		getPortStates();
-
-	int		portCommand(byte *cmd);
+	int			portCommand(byte *cmd);
+	int			readResponse(std::string &sResp, int nTimeout = MAX_TIMEOUT, char cEndOfResponse = 0x0a);
 
     SerXInterface   *m_pSerx;
 
