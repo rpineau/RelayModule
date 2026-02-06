@@ -53,41 +53,41 @@ enum Plugin_Errors    {PLUGIN_OK = 0, NOT_CONNECTED, ND_CANT_CONNECT, BAD_CMD_RE
 class CRelayModule
 {
 public:
-    CRelayModule();
-    ~CRelayModule();
-
-    int         Connect(std::string sPort);
-    void        Disconnect(void);
-    bool        IsConnected(void) { return m_bIsConnected; };
-
-    void        SetSerxPointer(SerXInterface *p) { m_pSerx = p; };
-
+	CRelayModule();
+	~CRelayModule();
+	
+	int         Connect(std::string sPort);
+	void        Disconnect(void);
+	bool        IsConnected(void) { return m_bIsConnected; };
+	
+	void        SetSerxPointer(SerXInterface *p) { m_pSerx = p; };
+	
 	int			getPortCount();
-
-    // getter and setter
-    int         getStatus(int &nStatus);
-    int         getFirmwareVersion(std::string sVersion);
-
-    int         setPortState(const int &nPortNumber, const bool &bEnabled);
+	
+	// getter and setter
+	int         getStatus(int &nStatus);
+	int         getFirmwareVersion(std::string sVersion);
+	
+	int         setPortState(const int &nPortNumber, const bool &bEnabled);
 	bool		getPortState(int nPort);
-
+	
 protected:
-
+	
 	int			portCommand(byte *cmd);
 	int			readResponse(std::string &sResp, int nTimeout = MAX_TIMEOUT, char cEndOfResponse = 0x0a);
-
-    SerXInterface   *m_pSerx;
-
-    bool		m_bDebugLog = false;
+	
+	SerXInterface   *m_pSerx;
+	
+	bool		m_bDebugLog = false;
 	bool		m_bIsConnected = false;;
-    char		m_szFirmwareVersion[TEXT_BUFFER_SIZE];
-
+	char		m_szFirmwareVersion[TEXT_BUFFER_SIZE];
+	
 	bool port1On = false;
 	bool port2On = false;
 	bool port3On = false;
 	bool port4On = false;
-
-
+	
+	
 #ifdef PLUGIN_DEBUG
 	std::string hexOut;
 	void    hexdump(const byte *inputData, int inputSize,  std::string &outHex);
@@ -96,7 +96,7 @@ protected:
 	std::ofstream m_sLogFile;
 	std::string m_sLogfilePath;
 #endif
-
+	
 };
 
 #endif //__RELAY_MODULE_C__

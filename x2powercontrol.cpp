@@ -1,34 +1,33 @@
 #include "x2powercontrol.h"
 
 X2PowerControl::X2PowerControl(const char* pszDisplayName,
-										const int& nInstanceIndex,
-										SerXInterface						* pSerXIn,
-										TheSkyXFacadeForDriversInterface	* pTheSkyXIn,
-										SleeperInterface					* pSleeperIn,
-										BasicIniUtilInterface				* pIniUtilIn,
-										LoggerInterface						* pLoggerIn,
-										MutexInterface						* pIOMutexIn,
-										TickCountInterface					* pTickCountIn):m_bLinked(0)
+							   const int& nInstanceIndex,
+							   SerXInterface						* pSerXIn,
+							   TheSkyXFacadeForDriversInterface	* pTheSkyXIn,
+							   SleeperInterface					* pSleeperIn,
+							   BasicIniUtilInterface				* pIniUtilIn,
+							   LoggerInterface						* pLoggerIn,
+							   MutexInterface						* pIOMutexIn,
+							   TickCountInterface					* pTickCountIn):m_bLinked(0)
 {
-    char portName[255];
+	char portName[255];
 	std::string sLabel;
-    int i;
+	int i;
 
 	m_pTheSkyXForMounts = pTheSkyXIn;
-	m_pSleeper = pSleeperIn;
 	m_pIniUtil = pIniUtilIn;
 	m_pIOMutex = pIOMutexIn;
 	m_pTickCount = pTickCountIn;
 
 	m_PowerPorts.SetSerxPointer(pSerXIn);
 	m_nISIndex = nInstanceIndex;
-    
-    if (m_pIniUtil) {
+
+	if (m_pIniUtil) {
 		// load port names
 		for(i=0; i<NB_PORTS; i++) {
-            sLabel = "Relay port " + std::to_string(i+1);
-            m_pIniUtil->readString(PARENT_KEY, m_IniPortKey[i].c_str(), sLabel.c_str(), portName, 255);
-            m_sPortNames.push_back(std::string(portName));
+			sLabel = "Relay port " + std::to_string(i+1);
+			m_pIniUtil->readString(PARENT_KEY, m_IniPortKey[i].c_str(), sLabel.c_str(), portName, 255);
+			m_sPortNames.push_back(std::string(portName));
 		}
 	}
 }
@@ -38,8 +37,6 @@ X2PowerControl::~X2PowerControl()
 	//Delete objects used through composition
 	if (GetTheSkyXFacadeForDrivers())
 		delete GetTheSkyXFacadeForDrivers();
-	if (GetSleeper())
-		delete GetSleeper();
 	if (GetSimpleIniUtil())
 		delete GetSimpleIniUtil();
 	if (GetMutex())
@@ -118,9 +115,9 @@ int X2PowerControl::queryAbstraction(const char* pszName, void** ppVal)
 	if (!strcmp(pszName, SerialPortParams2Interface_Name))
 		*ppVal = dynamic_cast<SerialPortParams2Interface*>(this);
 	else if (!strcmp(pszName, CircuitLabelsInterface_Name))
-        *ppVal = dynamic_cast<CircuitLabelsInterface*>(this);
-    else if (!strcmp(pszName, SetCircuitLabelsInterface_Name))
-        *ppVal = dynamic_cast<SetCircuitLabelsInterface*>(this);
+		*ppVal = dynamic_cast<CircuitLabelsInterface*>(this);
+	else if (!strcmp(pszName, SetCircuitLabelsInterface_Name))
+		*ppVal = dynamic_cast<SetCircuitLabelsInterface*>(this);
 
 	return 0;
 }
@@ -139,10 +136,10 @@ int X2PowerControl::circuitState(const int& nIndex, bool& bZeroForOffOneForOn)
 	int nErr = SB_OK;
 
 	if(!m_bLinked)
-        return ERR_NOLINK;
+		return ERR_NOLINK;
 
 	if (nIndex >= 0 && nIndex<m_PowerPorts.getPortCount())
-        bZeroForOffOneForOn = m_PowerPorts.getPortState(nIndex);
+		bZeroForOffOneForOn = m_PowerPorts.getPortState(nIndex);
 	else
 		nErr = ERR_INDEX_OUT_OF_RANGE;
 
@@ -154,10 +151,10 @@ int X2PowerControl::setCircuitState(const int& nIndex, const bool& bZeroForOffOn
 	int nErr = SB_OK;
 
 	if(!m_bLinked)
-        return ERR_NOLINK;
+		return ERR_NOLINK;
 
 	if (nIndex >= 0 && nIndex < m_PowerPorts.getPortCount())
-        nErr = m_PowerPorts.setPortState(nIndex, bZeroForOffOneForOn);
+		nErr = m_PowerPorts.setPortState(nIndex, bZeroForOffOneForOn);
 	else
 		nErr = ERR_INDEX_OUT_OF_RANGE;
 
@@ -166,30 +163,30 @@ int X2PowerControl::setCircuitState(const int& nIndex, const bool& bZeroForOffOn
 
 int X2PowerControl::circuitLabel(const int &nZeroBasedIndex, BasicStringInterface &str)
 {
-    int nErr = SB_OK;
-    if(m_sPortNames.size() >= nZeroBasedIndex+1) {
-        str = m_sPortNames[nZeroBasedIndex].c_str();
-    }
-    else {
-        std::string sLabel = "Relay port " + std::to_string(nZeroBasedIndex+1);
-        str = sLabel.c_str();
-    }
+	int nErr = SB_OK;
+	if(m_sPortNames.size() >= nZeroBasedIndex+1) {
+		str = m_sPortNames[nZeroBasedIndex].c_str();
+	}
+	else {
+		std::string sLabel = "Relay port " + std::to_string(nZeroBasedIndex+1);
+		str = sLabel.c_str();
+	}
 
-    return nErr;
+	return nErr;
 }
 
 int X2PowerControl::setCircuitLabel(const int &nZeroBasedIndex, const char *str)
 {
-    int nErr = SB_OK;
+	int nErr = SB_OK;
 
-    if(m_sPortNames.size() >= nZeroBasedIndex+1) {
-        m_sPortNames[nZeroBasedIndex] = str;
-        m_pIniUtil->writeString(PARENT_KEY, m_IniPortKey[nZeroBasedIndex].c_str(), str);
-    }
-    else {
-        nErr = ERR_CMDFAILED;
-    }
-    return nErr;
+	if(m_sPortNames.size() >= nZeroBasedIndex+1) {
+		m_sPortNames[nZeroBasedIndex] = str;
+		m_pIniUtil->writeString(PARENT_KEY, m_IniPortKey[nZeroBasedIndex].c_str(), str);
+	}
+	else {
+		nErr = ERR_CMDFAILED;
+	}
+	return nErr;
 }
 
 //
