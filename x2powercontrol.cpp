@@ -20,12 +20,13 @@ X2PowerControl::X2PowerControl(const char* pszDisplayName,
 	m_pIOMutex = pIOMutexIn;
 	m_pTickCount = pTickCountIn;
 
+	m_PowerPorts.SetSerxPointer(pSerXIn);
 	m_nISIndex = nInstanceIndex;
     
     if (m_pIniUtil) {
 		// load port names
 		for(i=0; i<NB_PORTS; i++) {
-            sLabel = "Fusion port " + std::to_string(i+1);
+            sLabel = "Relay port " + std::to_string(i+1);
             m_pIniUtil->readString(PARENT_KEY, m_IniPortKey[i].c_str(), sLabel.c_str(), portName, 255);
             m_sPortNames.push_back(std::string(portName));
 		}
@@ -47,20 +48,30 @@ X2PowerControl::~X2PowerControl()
 
 int X2PowerControl::establishLink(void)
 {
-	int nErr = SB_OK;
+	int nErr;
+	std::string sPortName;
+	X2MutexLocker ml(GetMutex());
 
-	m_PowerPorts.Connect("");
-
-    m_bLinked = true;
+	// get serial port device name, and IP and port if the connection is over TCP.
+	getPortName(sPortName);
+	nErr = m_PowerPorts.Connect(sPortName);
+	if(nErr) {
+		m_bLinked = false;
+	}
+	else
+		m_bLinked = true;
 
 	return nErr;
 }
 
 int X2PowerControl::terminateLink(void)
 {
+	X2MutexLocker ml(GetMutex());
+
+	m_PowerPorts.Disconnect();
 	m_bLinked = false;
 
-    return SB_OK;
+	return SB_OK;
 }
 
 bool X2PowerControl::isLinked() const
@@ -160,7 +171,7 @@ int X2PowerControl::circuitLabel(const int &nZeroBasedIndex, BasicStringInterfac
         str = m_sPortNames[nZeroBasedIndex].c_str();
     }
     else {
-        std::string sLabel = "Fusion port " + std::to_string(nZeroBasedIndex+1);
+        std::string sLabel = "Relay port " + std::to_string(nZeroBasedIndex+1);
         str = sLabel.c_str();
     }
 

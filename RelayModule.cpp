@@ -19,7 +19,7 @@ CRelayModule::CRelayModule()
 	m_sLogfilePath += "\\RelayModole.txt";
 #else
 	m_sLogfilePath = getenv("HOME");
-	m_sLogfilePath += "/RTI-Dome-Log.txt";
+	m_sLogfilePath += "/RelayModole.txt";
 #endif
 	m_sLogFile.open(m_sLogfilePath, std::ios::out |std::ios::trunc);
 #endif
@@ -55,6 +55,11 @@ int CRelayModule::Connect(std::string sPort)
 	m_sLogFile.flush();
 #endif
 
+#if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
+	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [" << __func__ << "] Connecting to " << sPort << std::endl;
+	m_sLogFile.flush();
+#endif
+
     // 9600 8N1
     nErr = m_pSerx->open(sPort.c_str(), 9600, SerXInterface::B_NOPARITY, "-DTR_CONTROL 1");
     if(nErr == 0)
@@ -62,12 +67,17 @@ int CRelayModule::Connect(std::string sPort)
     else
         m_bIsConnected = false;
 
-    if(!m_bIsConnected)
-        return nErr;
-
+	if(!m_bIsConnected) {
 #if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
 		m_sLogFile << "["<<getTimeStamp()<<"]"<< " [" << __func__ << "] Connection failed, nErr = " << nErr <<  std::endl;
 		m_sLogFile.flush();
+#endif
+		return nErr;
+	}
+
+#if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
+	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [" << __func__ << "] Connected to " << sPort << std::endl;
+	m_sLogFile.flush();
 #endif
 
     return nErr;
@@ -84,6 +94,10 @@ void CRelayModule::Disconnect()
 #pragma mark getters and setters
 int CRelayModule::getPortCount()
 {
+#if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
+	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [" << __func__ << "] Called." << std::endl;
+	m_sLogFile.flush();
+#endif
 	return NB_PORTS;
 }
 
@@ -113,6 +127,15 @@ int CRelayModule::setPortState(const int &nPortNumber, const bool &bEnabled)
     int nErr = PLUGIN_OK;
 	byte portStateCmd[4] = {0xA0, 0x00, 0x00, 0x00};
 
+	if(!m_bIsConnected)
+		return ERR_COMMNOLINK;
+
+
+#if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
+	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [" << __func__ << "] Called." << std::endl;
+	m_sLogFile.flush();
+#endif
+
 	//set port
 	portStateCmd[1] = byte(nPortNumber+1);
 	// set state
@@ -133,6 +156,11 @@ bool CRelayModule::getPortState(int nPort)
 	int nErr = PLUGIN_OK;
 	std::string sResp;
 	byte portStatesCmd[4] = {0xA0, 0x01, 0x02, 0xA3};
+
+#if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
+	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [" << __func__ << "] Called." << std::endl;
+	m_sLogFile.flush();
+#endif
 
 	if(!m_bIsConnected)
 		return ERR_COMMNOLINK;
@@ -157,6 +185,11 @@ int CRelayModule::portCommand(byte *cmd)
 	int nErr = PLUGIN_OK;
 	int nBytesWaiting;
 	unsigned long  ulBytesWrite;
+
+#if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
+	m_sLogFile << "["<<getTimeStamp()<<"]"<< " [" << __func__ << "] Called." << std::endl;
+	m_sLogFile.flush();
+#endif
 
 	if(!m_bIsConnected)
 		return ERR_COMMNOLINK;
